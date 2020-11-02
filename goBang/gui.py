@@ -294,16 +294,23 @@ class WaitingRoom:
 class quit_ui:
     def __init__(self):
         
-        self.top=tk.Tk()
-        self.top.title("opps!")
-        self.top.minsize(300,150)
-        self.t_lable=tk.Label(top,text='对方已经退出！')
-        self.ok_button=tk.Button(top,text='OK',command=self.endui)
-        self.t_lable.pack()
-        self.ok_button.pack()
-        self.top.mainloop()
-    def endui(self):
-        self.top.destroy()
+        # self.top=tk.Tk()
+        # self.top.title("opps!")
+        # self.top.minsize(300,150)
+        # self.t_lable=tk.Label(self.top,text='对方已经退出！')
+        # self.ok_button=tk.Button(self.top,text='OK',command=self.endui)
+        # self.t_lable.pack()
+        # self.ok_button.pack()
+        # self.top.mainloop()
+
+        # answer = messagebox.askyesno('combat request',
+        #                              '对手已退出！')
+        messagebox.showinfo('combat request',
+                                     '对手已退出！')
+
+
+    # def endui(self):
+    #     self.top.destroy()
 ###
 
 class Display:  # 棋盘显示程序
@@ -371,6 +378,7 @@ class Display:  # 棋盘显示程序
 
     def receive_position(self):
         while True:
+
             if self.my_turn_flag is False:
                 print('receiving')
                 if self.buffer == ['']:
@@ -378,8 +386,8 @@ class Display:  # 棋盘显示程序
                 if self.buffer:
                     print('info', self.buffer)
                     ######
-                    if info=='quit.':
-                        endbattle=1;
+                    # if info=='quit.':
+                    #     endbattle=1;
                     ######
                     info = self.buffer.pop(0)
                     info = info.split('.')[1].split(',')
@@ -389,12 +397,18 @@ class Display:  # 棋盘显示程序
                     self.change_turn()
                 else:
                     info = self.s.recv(1024).decode('utf-8')
-                    
+
+                    if info == 'quit.':
+                        # self.win.destroy()
+                        self.win.quit()
+                        a = quit_ui()
+
                     info = info.split('#')
                     for info_ in info:
                         self.buffer.append(info_)
                     info = self.buffer.pop(0)
                     info = info.split('.')[1].split(',')
+
                     self.game_board.make_move([int(info[0]), int(info[1])], self.turn)
                     self.display_chess(self.game_board)
                     self.turn = -self.turn
@@ -479,10 +493,10 @@ class Display:  # 棋盘显示程序
         if self.s is not None:
             self.s.send(bytes('quit.','utf-8'))
             self.s.close()
-        self.win.quit()
+        # self.win.destroy()
     ###
     def display(self):
-        self.display_chess(self.game_board)
+        # self.display_chess(self.game_board)
         self.board_frame.pack(side=tk.LEFT)
         # self.control_panel.pack(side=tk.RIGHT)
         self.display_canvas.pack()
